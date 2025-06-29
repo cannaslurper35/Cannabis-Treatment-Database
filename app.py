@@ -25,17 +25,18 @@ st.markdown("""
 Use this tool to track your **cannabis-based medicines**, including manufacturer, cultivar, and symptoms you're medicating for.
 """)
 
-# Replace these with the full lists you provided
+# Full lists from MedBudWiki (shortened here for brevity, expand as needed)
 manufacturers = [
     '4C Labs Ltd.', 'All Nations Mestiyexw Holdings', 'Althea MMJ UK Ltd', 'Dispensed Pty Ltd.',
     'Aurora Europe GmbH', 'Castle Rock Farms Inc.', 'Big Narstie Medical Ltd', 'Habitat Life Sciences Inc.',
-    # ... rest of your list
+    'Ampyl Sciences Ltd', 'MediCann Ltd', 'Canopy Growth Corp', 'Cellen Biotech Ltd',
+    # ... complete your list
 ]
 
 cultivars = [
     '4C Labs', 'All Nations', 'Althea', 'Altmed', 'Aurora', 'BC Green', 'Big Narstie Medical',
-    'Cake & Caviar', 'CannFX', 'CannyCann',
-    # ... rest of your list
+    'Cake & Caviar', 'CannFX', 'CannyCann', 'Canopy Growth', 'Cellen', 'Clearleaf',
+    # ... complete your list
 ]
 
 with st.sidebar:
@@ -47,8 +48,11 @@ if st.session_state.get('adding'):
     with st.form('new_entry_form', clear_on_submit=True):
         strain = st.text_input('Strain Name')
 
-        manufacturer = st.selectbox('Manufacturer', manufacturers)
-        cultivar = st.selectbox('Cultivar', cultivars)
+        with st.expander('Select Manufacturer'):
+            manufacturer = st.selectbox('Manufacturer (Searchable)', manufacturers, key='manufacturer_select')
+
+        with st.expander('Select Cultivar'):
+            cultivar = st.selectbox('Cultivar (Searchable)', cultivars, key='cultivar_select')
 
         product_type = st.selectbox('Medication Format', [
             'Bud/Flower', 'Sublingual Oil', 'Vape Cartridge', 'Pill/ Capsule',
@@ -62,18 +66,32 @@ if st.session_state.get('adding'):
         quantity = st.number_input('Quantity Ordered (g/ml)', 0.0)
 
         st.markdown("### Primary Symptoms Treated")
-        anxiety = st.checkbox('Anxiety')
-        muscular_pain = st.checkbox('Muscular Pain')
-        joint_pain = st.checkbox('Joint Pain')
-        nerve_pain = st.checkbox('Nerve Pain')
+
+        anxiety_level = st.slider('Anxiety (1-10)', 1, 10)
+        anxiety_notes = st.text_area('Anxiety Notes')
+
+        muscular_pain_level = st.slider('Muscular Pain (1-10)', 1, 10)
+        muscular_pain_notes = st.text_area('Muscular Pain Notes')
+
+        joint_pain_level = st.slider('Joint Pain (1-10)', 1, 10)
+        joint_pain_notes = st.text_area('Joint Pain Notes')
+
+        nerve_pain_level = st.slider('Nerve Pain (1-10)', 1, 10)
+        nerve_pain_notes = st.text_area('Nerve Pain Notes')
 
         st.markdown("### Secondary Effects")
-        mood = st.checkbox('Mood')
-        appetite = st.checkbox('Appetite')
-        motivation = st.checkbox('Motivation')
 
-        rating = st.slider('Effectiveness Rating (1-10)', 1, 10)
-        notes = st.text_area('Notes (Reviews/Reddit/Discord)')
+        mood_level = st.slider('Mood (1-10)', 1, 10)
+        mood_notes = st.text_area('Mood Notes')
+
+        appetite_level = st.slider('Appetite (1-10)', 1, 10)
+        appetite_notes = st.text_area('Appetite Notes')
+
+        motivation_level = st.slider('Motivation (1-10)', 1, 10)
+        motivation_notes = st.text_area('Motivation Notes')
+
+        rating = st.slider('Overall Effectiveness (1-10)', 1, 10)
+        notes = st.text_area('General Notes (Reviews/Reddit/Discord)')
         personal_notes = st.text_area('Personal Experience Notes')
         reorder = st.selectbox('Would Reorder?', ['Y', 'N'])
 
@@ -89,33 +107,23 @@ if st.session_state.get('adding'):
                 'Terpene Profile': terpenes,
                 'Price (£)': price,
                 'Quantity Ordered (g/ml)': quantity,
-                'Anxiety': anxiety,
-                'Muscular Pain': muscular_pain,
-                'Joint Pain': joint_pain,
-                'Nerve Pain': nerve_pain,
-                'Mood': mood,
-                'Appetite': appetite,
-                'Motivation': motivation,
+                'Anxiety Level': anxiety_level,
+                'Anxiety Notes': anxiety_notes,
+                'Muscular Pain Level': muscular_pain_level,
+                'Muscular Pain Notes': muscular_pain_notes,
+                'Joint Pain Level': joint_pain_level,
+                'Joint Pain Notes': joint_pain_notes,
+                'Nerve Pain Level': nerve_pain_level,
+                'Nerve Pain Notes': nerve_pain_notes,
+                'Mood Level': mood_level,
+                'Mood Notes': mood_notes,
+                'Appetite Level': appetite_level,
+                'Appetite Notes': appetite_notes,
+                'Motivation Level': motivation_level,
+                'Motivation Notes': motivation_notes,
                 'Effectiveness Rating (1-10)': rating,
-                'Notes': notes,
+                'General Notes': notes,
                 'Personal Experience Notes': personal_notes,
                 'Would Reorder?': reorder
             })
-            save_data(data)
-            st.success('Entry saved!')
-            st.session_state['adding'] = False
-            st.experimental_rerun()
-
-st.subheader('Current Entries')
-
-if data:
-    df = pd.DataFrame(data)
-    st.dataframe(df)
-
-    csv = df.to_csv(index=False).encode('utf-8')
-    json_data = json.dumps(data, indent=2).encode('utf-8')
-
-    st.download_button('Download CSV', data=csv, file_name='cannabis_tracker_data.csv', mime='text/csv')
-    st.download_button('Download JSON', data=json_data, file_name='cannabis_tracker_data.json', mime='application/json')
-else:
-    st.info('No entries yet. Add your first record using the sidebar.')
+            save_data
