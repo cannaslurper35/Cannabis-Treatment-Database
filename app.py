@@ -25,16 +25,17 @@ st.markdown("""
 Use this tool to track your **cannabis-based medicines**, including manufacturer, cultivar, and symptoms you're medicating for.
 """)
 
+# Replace these with the full lists you provided
 manufacturers = [
     '4C Labs Ltd.', 'All Nations Mestiyexw Holdings', 'Althea MMJ UK Ltd', 'Dispensed Pty Ltd.',
     'Aurora Europe GmbH', 'Castle Rock Farms Inc.', 'Big Narstie Medical Ltd', 'Habitat Life Sciences Inc.',
-    # ... continue full list from your provided data
+    # ... rest of your list
 ]
 
 cultivars = [
     '4C Labs', 'All Nations', 'Althea', 'Altmed', 'Aurora', 'BC Green', 'Big Narstie Medical',
-    'Cake & Caviar', 'CannFX', 'CannyCann', 'Canopy Growth', 'Cellen', 'Clearleaf', 'CP Medical',
-    # ... continue full list from your provided data
+    'Cake & Caviar', 'CannFX', 'CannyCann',
+    # ... rest of your list
 ]
 
 with st.sidebar:
@@ -46,8 +47,8 @@ if st.session_state.get('adding'):
     with st.form('new_entry_form', clear_on_submit=True):
         strain = st.text_input('Strain Name')
 
-        manufacturer = st.selectbox('Manufacturer (Searchable)', manufacturers)
-        cultivar = st.selectbox('Cultivar (Searchable)', cultivars)
+        manufacturer = st.selectbox('Manufacturer', manufacturers)
+        cultivar = st.selectbox('Cultivar', cultivars)
 
         product_type = st.selectbox('Medication Format', [
             'Bud/Flower', 'Sublingual Oil', 'Vape Cartridge', 'Pill/ Capsule',
