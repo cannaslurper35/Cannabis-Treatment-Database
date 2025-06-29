@@ -22,8 +22,36 @@ st.set_page_config(page_title='Cannabis-Based Medicines Tracker', layout='wide')
 st.title('Cannabis-Based Medicines Tracker')
 
 st.markdown("""
-Use this tool to track your **cannabis-based medicines**, including strain details, classifications, chemotype, irradiation type, and personal effectiveness notes.
+Use this tool to track your **cannabis-based medicines**, including strain details, manufacturer, chemotype, and personal effectiveness notes.
 """)
+
+manufacturers = [
+    '4C Labs Ltd.', 'All Nations Mestiyexw Holdings', 'Althea MMJ UK Ltd', 'Dispensed Pty Ltd.',
+    'Aurora Europe GmbH', 'Castle Rock Farms Inc.', 'Big Narstie Medical Ltd', 'Habitat Life Sciences Inc.',
+    'Ampyl Sciences Ltd', 'MediCann Ltd', 'Canopy Growth Corp', 'Cellen Biotech Ltd',
+    'Clearleaf Ltd', 'CP Medical', 'Montu Group Pty Ltd.', 'Crop Circle Dispensary Ltd.',
+    'Cookies Creative Productions & Consulting Inc.', 'Curaleaf Holdings Inc', 'Dalgety Ltd',
+    'DOE Medical Ltd.', 'Doja Medical', 'Prime Pot Inc.', 'ECS Pharma Ltd', 'Endopure Medical Ltd',
+    'Glass Pharms Ltd', 'Grow Lab Organics Ltd', 'GreenJoy Inc.', 'BZAM Ltd', 'Grow Group PLC',
+    # ... (you can add more here from your list)
+]
+
+cultivars = [
+    '4C Labs', 'All Nations', 'Althea', 'Altmed', 'Aurora', 'BC Green', 'Big Narstie Medical',
+    'Cake & Caviar', 'CannFX', 'CannyCann', 'Canopy Growth', 'Cellen', 'Clearleaf', 'CP Medical',
+    'Craft Botanics', 'Crop Circle Therapeutics', 'Cookies', 'Curaleaf', 'Curo', 'Dalgety',
+    'Dispensed Labs', 'Dank of England Medical', 'Doja', 'EastCann', 'ECS Pharma', 'Endopure',
+    'Find', 'Four20 Pharma', 'Glass Pharms', 'GLO', 'Grassroots', 'Green Joÿ',
+    # ... (you can add more here from your list)
+]
+
+primary_symptoms = [
+    'Anxiety', 'Muscular Pain', 'Joint Pain', 'Nerve Pain', 'Sleep Issues', 'Depression'
+]
+
+secondary_symptoms = [
+    'Appetite', 'Mood', 'Motivation', 'Focus', 'Energy'
+]
 
 with st.sidebar:
     st.header("Add New Entry")
@@ -34,11 +62,12 @@ if st.session_state.get('adding'):
     with st.form('new_entry_form', clear_on_submit=True):
         with st.expander('Basic Info', expanded=True):
             strain = st.text_input('Strain Name')
+            cultivar = st.selectbox('Cultivar', cultivars)
+            manufacturer = st.selectbox('Manufacturer', manufacturers)
             product_type = st.selectbox('Medication Format', [
                 'Bud/Flower', 'Sublingual Oil', 'Vape Cartridge', 'Pill/ Capsule',
                 'Edible', 'Topical', 'Oral Spray', 'Inhaler', 'Patch'
             ])
-            vendor = st.text_input('Vendor/Source')
             availability = st.selectbox('Medication Availability', [
                 'Available', 'Discontinued', 'Out of Stock', 'Unreleased',
                 'Limited Access', 'Not Currently Imported'
@@ -66,7 +95,9 @@ if st.session_state.get('adding'):
             price = st.number_input('Price (£)', 0.0)
             quantity = st.number_input('Quantity Ordered (g/ml)', 0.0)
         
-        with st.expander('Effectiveness & Notes'):
+        with st.expander('Symptoms & Effectiveness'):
+            primary = st.multiselect('Primary Symptoms Treated', primary_symptoms)
+            secondary = st.multiselect('Secondary Effects', secondary_symptoms)
             rating = st.slider('Effectiveness Rating (1-5)', 1, 5)
             notes = st.text_area('Notes (Reviews/Reddit/Discord)')
             personal_notes = st.text_area('Personal Experience Notes')
@@ -76,18 +107,21 @@ if st.session_state.get('adding'):
         if submitted:
             data.append({
                 'Strain Name': strain,
+                'Cultivar': cultivar,
+                'Manufacturer': manufacturer,
                 'Medication Format': product_type,
                 'Classification': classification,
                 'Chemotype': chemotype,
                 'Flower Irradiation': irradiation,
                 'Flower Format': flower_format,
                 'Medication Availability': availability,
-                'Vendor/Source': vendor,
                 'THC %': thc,
                 'CBD %': cbd,
                 'Terpene Profile': terpenes,
                 'Price (£)': price,
                 'Quantity Ordered (g/ml)': quantity,
+                'Primary Symptoms': primary,
+                'Secondary Effects': secondary,
                 'Effectiveness Rating (1-5)': rating,
                 'Notes': notes,
                 'Personal Experience Notes': personal_notes,
