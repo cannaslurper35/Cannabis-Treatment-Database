@@ -2,6 +2,7 @@ import streamlit as st
 import json
 import os
 import pandas as pd
+from textblob import TextBlob
 
 data_file = 'medical_flower_data.json'
 
@@ -25,21 +26,26 @@ st.markdown("""
 Use this tool to track your **cannabis-based medicines**, including manufacturer, cultivar, symptoms you're medicating for, and effectiveness.
 """)
 
-# Replace below with your FULL lists
+# Full manufacturer and cultivar lists (replace with your entire lists as needed)
 manufacturers = [
     '4C Labs Ltd.', 'All Nations Mestiyexw Holdings', 'Althea MMJ UK Ltd',
-    # ... rest of your list
+    'Dispensed Pty Ltd.', 'Aurora Europe GmbH', 'Castle Rock Farms Inc.',
+    'Big Narstie Medical Ltd', 'Habitat Life Sciences Inc.', 'Ampyl Sciences Ltd',
+    # ... include full list
 ]
 
 cultivars = [
-    '4C Labs', 'All Nations', 'Althea',
-    # ... rest of your list
+    '4C Labs', 'All Nations', 'Althea', 'Altmed', 'Aurora', 'BC Green',
+    'Big Narstie Medical', 'Cake & Caviar', 'CannFX', 'CannyCann',
+    # ... include full list
 ]
 
 with st.sidebar:
     st.header("Add New Entry")
     if st.button('Start New Entry'):
         st.session_state['adding'] = True
+    if st.button('Analyse Reviews'):
+        st.session_state['analysing'] = True
 
 if st.session_state.get('adding'):
     with st.form('new_entry_form', clear_on_submit=True):
@@ -128,6 +134,35 @@ if st.session_state.get('adding'):
             st.success('Entry saved!')
             st.session_state['adding'] = False
             st.experimental_rerun()
+
+if st.session_state.get('analysing'):
+    st.subheader("Analyse Reviews")
+    st.markdown("You can paste reviews below or upload a text file containing reviews.")
+
+    review_text = st.text_area("Paste Reviews Here")
+    uploaded_file = st.file_uploader("Or Upload a Text File", type=['txt'])
+
+    if st.button('Analyse'):
+        combined_reviews = review_text
+        if uploaded_file:
+            combined_reviews += uploaded_file.read().decode()
+
+        blob = TextBlob(combined_reviews)
+        sentiment = blob.sentiment.polarity
+        words = combined_reviews.split()
+        positive_words = [word for word in words if TextBlob(word).sentiment.polarity > 0]
+        negative_words = [word for word in words if TextBlob(word).sentiment.polarity < 0]
+
+        st.markdown("### Review Summary")
+        st.write(f"Overall Sentiment Score (from -1 to 1): {sentiment:.2f}")
+        st.write(f"Number of Words: {len(words)}")
+        st.write(f"Most Positive Words: {', '.join(positive_words[:10])}")
+        st.write(f"Most Negative Words: {', '.join(negative_words[:10])}")
+
+        overall_rating = int((sentiment + 1) * 5)
+        st.write(f"Approximate Overall Rating (1-10): {overall_rating}")
+
+        st.session_state['analysing'] = False
 
 st.subheader('Current Entries')
 
